@@ -1,0 +1,39 @@
+{
+  "name": "aiwriter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently --kill-others --names rollup,web-dev-server \"npm run rollup:watch\" \"web-dev-server --config web-dev-server.config.js -r dist\"",
+    "rollup:watch": "rollup -w -m -c rollup.config.mjs",
+    "build": "rimraf dist && rollup -c rollup.config.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@lit/task": "^1.0.2",
+    "@shoelace-style/shoelace": "^2.20.1",
+    "lit": "^3.2.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@tailwindcss/postcss": "^4.0.15",
+    "@web/dev-server": "^0.4.6",
+    "@web/rollup-plugin-html": "^2.3.0",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.3",
+    "postcss-import": "^16.1.0",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.37.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-dotenv": "^0.5.1",
+    "rollup-plugin-import-css": "^3.5.8",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-watch": "^4.3.1",
+    "tailwindcss": "^4.0.15",
+    "typescript": "^5.8.2"
+  }
+}
