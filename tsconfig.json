@@ -3,6 +3,7 @@
       "experimentalDecorators": true,
       "module": "esnext",
       "moduleResolution": "node",
+      "allowSyntheticDefaultImports": true,
     },
 }
   

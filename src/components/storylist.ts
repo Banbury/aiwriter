@@ -38,8 +38,7 @@ export class Storylist extends LitElement {
     }
 
     private onClick(id: number) {
-        console.log("Click!", id)
         this.story = id
-        this.dispatchEvent(new CustomEvent('story-selected', { detail: { story: id } }))
+        this.dispatchEvent(new CustomEvent('story-selected', { detail: { story: id }, bubbles: true, composed: true }))
     }
 }

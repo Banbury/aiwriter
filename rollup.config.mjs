@@ -4,12 +4,15 @@ import terser from "@rollup/plugin-terser";
 import postcss from "rollup-plugin-postcss";
 import typescript from "@rollup/plugin-typescript";
 import tailwindcss from "@tailwindcss/postcss"
-import css from "rollup-plugin-import-css";
 import postcssimport from "postcss-import";
 import dotenv from "rollup-plugin-dotenv"
+import commonjs from "@rollup/plugin-commonjs";
 
 export default {
   input: 'index.html',
+  output: {
+    format: "es"
+  },
   plugins: [
     html({ extractAssets: false }),
 
@@ -30,24 +33,26 @@ export default {
           "strictPropertyInitialization": false,
           "sourceMap": true, 
           "inlineSources": true,
+          "useDefineForClassFields": false,
+          "allowSyntheticDefaultImports": true,
         },
         "include": ["./src/**/*.ts"]
       }
     ),
 
+    commonjs({
+      defaultIsModuleExports: true,
+    }),
+
     postcss({
       extract: true, 
       minimize: true,
       extensions: ['.css'],
-      // inject: {
-      //   insertAt: "top",
-      // },
       plugins: [
         postcssimport(),
         tailwindcss(),
       ],
     }),
-//    css(),
     terser(),
 
     copy({
