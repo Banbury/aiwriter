@@ -8,7 +8,7 @@ import "./components/titlebar";
 import "./components/storylist";
 import "./components/storyeditor"
 
-setBasePath('./assets/shoelace/dist');
+setBasePath('./assets/shoelace');
 
 @customElement("main-window")
 class MainWindow extends LitElement {

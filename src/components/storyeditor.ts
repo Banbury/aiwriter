@@ -12,6 +12,8 @@ import { Storyblock } from "../models/storyblock"
 export class StoryEditor extends LitElement {
     @property() private story: number
 
+    private input: HTMLInputElement | null
+
     private stories = new Task(this, {
         task: async ([story], {signal}) => {
             if (this.story) {
@@ -26,24 +28,36 @@ export class StoryEditor extends LitElement {
         args: () => [this.story]
     })
 
-    protected updated(_changedProperties: PropertyValues): void {
-        super.updated(_changedProperties)
+    protected firstUpdated(_changedProperties: PropertyValues): void {
+        this.input = this.renderRoot.querySelector("#input")
     }
 
     protected render(): TemplateResult {
         return html`
-            <link href="./app.css" rel="stylesheet">
-        <div class="grid gap-2 p-2 overflow-y-auto">
-            ${this.stories.render({
-                pending: () => html`<p>Loading...</p>`,
-                complete: (value) => html`
-                    ${value.result.map((s: Storyblock) => html`
-                    <div class="border border-light-border cursor-pointer block w-auto p-1 h-fit bg-white">${unsafeHTML(marked.parse(s.text, { async: false }))}</div>
-                    `)}
-                `,
-                error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
-            })}
+        <link href="./app.css" rel="stylesheet">
+        <div class="h-full flex flex-col">
+            <div class="p-2 overflow-y-auto grow flex flex-col gap-2">
+                ${this.stories.render({
+                    pending: () => html`<p>Loading...</p>`,
+                    complete: (value) => html`
+                        ${value.result.map((s: Storyblock) => html`
+                        <div class="border border-light-border cursor-pointer block w-auto p-1 h-fit bg-white">${unsafeHTML(marked.parse(s.text, { async: false }))}</div>
+                        `)}
+                    `,
+                    error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
+                })}
+            </div>
+            <div ?hidden=${ !this.story } class="bg-white flex flex-row gap-2 p-2" style="box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);">
+                <textarea id="input" rows="3" class="border rounded border-light-border text-sm h-full grow"></textarea>
+                <sl-button variant="primary" @click="${this.onSend()}">
+                    Send <sl-icon name="send"></sl-icon>
+                </sl-button>
+            </div>
         </div>
         `
+    }
+
+    private onSend() {
+        this.dispatchEvent(new CustomEvent('send', { detail: { prompt: this.input?.innerText }, bubbles: true, composed: true }))
     }
 }
