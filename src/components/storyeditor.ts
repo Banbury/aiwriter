@@ -7,12 +7,20 @@ import { marked } from 'marked';
 
 import { StoryService } from "../services/story-service"
 import { Storyblock } from "../models/storyblock"
+import { LLMService } from "../services/llm-service";
 
 @customElement('story-editor')
 export class StoryEditor extends LitElement {
     @property() private story: number
 
+    private llmService: LLMService
+
     private input: HTMLInputElement | null
+
+    constructor() {
+        super()
+        this.llmService = new LLMService()
+    }
 
     private stories = new Task(this, {
         task: async ([story], {signal}) => {

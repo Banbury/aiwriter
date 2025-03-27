@@ -1,8 +1,15 @@
 // import "./styles/main.css"
 import { LitElement, PropertyValues, html } from "lit"
-import {customElement, property, state} from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 import '@shoelace-style/shoelace/dist/components/button/button.js';
+import '@shoelace-style/shoelace/dist/components/input/input.js';
+import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
+import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
+import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
+import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
+import '@shoelace-style/shoelace/dist/components/switch/switch.js';
+
 import { setBasePath } from '@shoelace-style/shoelace/dist/utilities/base-path.js';
 import "./components/titlebar";
 import "./components/storylist";

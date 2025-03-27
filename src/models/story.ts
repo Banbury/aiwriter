@@ -1,6 +1,6 @@
 export class Story {
     id: number;
     name: string;
-    description: string;
-    model: string;
+    description?: string;
+    model?: string;
 }
