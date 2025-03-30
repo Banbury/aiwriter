@@ -13,14 +13,9 @@ import { LLMService } from "../services/llm-service";
 export class StoryEditor extends LitElement {
     @property() private story: number
 
-    private llmService: LLMService
+    private readonly llmService = new LLMService()
 
     private input: HTMLInputElement | null
-
-    constructor() {
-        super()
-        this.llmService = new LLMService()
-    }
 
     private storyblocks = new Task(this, {
         task: async ([story], {signal}) => {

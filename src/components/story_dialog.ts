@@ -12,7 +12,7 @@ import { Story } from "../models/story"
 export class StoryDialog extends LitElement {
     @property({ attribute: "story"}) story_id: number
 
-    private storyService = new StoryService()
+    private readonly storyService = new StoryService()
 
     @query("#dialog")
     private dialog: SlDialog

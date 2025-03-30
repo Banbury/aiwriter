@@ -9,7 +9,7 @@ import { StoryService } from "../services/story-service"
 
 @customElement("new-story-dialog")
 export class NewStoryDialog extends LitElement {
-    private storyService = new StoryService()
+    private readonly storyService = new StoryService()
     private story = new Story()
 
     @query("#dialog")
