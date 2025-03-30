@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import '@shoelace-style/shoelace/dist/themes/light.css';
+@import "tailwindcss";
 
 @theme {
     --color-window-background: #f2f2f2;

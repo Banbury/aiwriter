@@ -48,6 +48,12 @@ export class StoryService {
         })
     }
 
+    async deleteStory(id: number) {
+        return this.executeScript("POST", "writer_delete_story", {
+            id: id
+        })
+    }
+
     async getStoryBlocks(id: number): Promise<Response> {
         return this.executeScript("POST", "writer_get_story_blocks", { id: id })
     }

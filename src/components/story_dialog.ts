@@ -2,7 +2,10 @@ import { LitElement, html, TemplateResult, css, PropertyValues } from "lit"
 import {customElement, property, query, state} from 'lit/decorators.js'
 import { Task } from '@lit/task'
 import { StoryService } from "../services/story-service"
-import { SlDialog, SlInput, SlTextarea } from "@shoelace-style/shoelace"
+import { SlDialog} from "@shoelace-style/shoelace"
+
+import "./story_form"
+import { StoryForm } from "./story_form"
 import { Story } from "../models/story"
 
 @customElement("story-dialog")
@@ -14,11 +17,8 @@ export class StoryDialog extends LitElement {
     @query("#dialog")
     private dialog: SlDialog
 
-    @query("#name")
-    private nameInput: SlInput
-
-    @query("#description")
-    private descriptionTextarea: SlTextarea
+    @query("#form")
+    private form: StoryForm
 
     private story = new Task(this, {
         task: async ([id], {signal}): Promise<Story> => {
@@ -32,10 +32,15 @@ export class StoryDialog extends LitElement {
         args: () => [this.story_id]
     })
 
-static styles = css`
+    static styles = css`
+        sl-button[variant="text"] {
+            width: 25px;
+        }
+
         sl-button[variant="text"]::part(base) {
             color: black;
         }
+
         sl-dialog::part(base) {
             color: black;
         }
@@ -45,14 +50,13 @@ static styles = css`
         return html`
         <link href="./app.css" rel="stylesheet">
         <div>
-            <sl-button variant="text" size="small" @click="${this.on_open}"><sl-icon name="pencil-square"></sl-icon></sl-button>
+            <sl-button variant="text" @click="${this.on_open}"><sl-icon name="pencil-square"></sl-icon></sl-button>
             <sl-dialog id="dialog" label="Story">
-                <div class="flex flex-col gap-2">
+                <div>
                     ${this.story.render({
                         pending: () => html`<p>Loading...</p>`,
                         complete: (value) => html`
-                            <sl-input id="name" label="Name" value="${value.name}"></sl-input>
-                            <sl-textarea id="description" label="Description" rows="5" value="${value.description}"></sl-textarea>
+                        <story-form id="form" .story=${value}></story-form>
                         `,
                         error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
                     })}
@@ -73,8 +77,8 @@ static styles = css`
     private on_save() {
         this.storyService.saveStory({ 
             id: this.story_id, 
-            name: this.nameInput.value, 
-            description: this.descriptionTextarea.value 
+            name: this.form.name, 
+            description: this.form.description 
         })
         .then (() => this.dispatchEvent(new CustomEvent("update", { bubbles: true, composed: true })))
         this.dialog.hide()

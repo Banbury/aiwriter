@@ -6,7 +6,6 @@ import typescript from "@rollup/plugin-typescript";
 import tailwindcss from "@tailwindcss/postcss"
 import postcssimport from "postcss-import";
 import dotenv from "rollup-plugin-dotenv"
-import commonjs from "@rollup/plugin-commonjs";
 
 export default {
   input: 'index.html',
@@ -40,10 +39,6 @@ export default {
       }
     ),
 
-    commonjs({
-      defaultIsModuleExports: true,
-    }),
-
     postcss({
       extract: true, 
       minimize: true,
@@ -53,6 +48,7 @@ export default {
         tailwindcss(),
       ],
     }),
+
     terser(),
 
     copy({
