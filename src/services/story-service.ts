@@ -58,6 +58,14 @@ export class StoryService {
         return this.executeScript("POST", "writer_get_story_blocks", { id: id })
     }
 
+    async getBackgroundsForStory(id: number): Promise<Response> {
+        return this.executeScript("POST", "writer_get_backgrounds_for_story", { id: id })
+    }
+
+    async enableBackground(id: number, enabled: boolean) {
+        return this.executeScript("POST", "writer_enable_background", { id: id, enabled: Number(enabled) })
+    }
+
     private async getResult(id: string): Promise<Response> {
         let status = null
         while (!status?.success) {

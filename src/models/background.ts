@@ -2,6 +2,6 @@ export class Background {
     id: number;
     name: string;
     description: string;
-    type: 'character'|'location'|'general';
-    enabled: boolean;
+    tags: string;
+    enabled: number;
 }
