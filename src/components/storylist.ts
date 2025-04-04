@@ -20,13 +20,7 @@ export class Storylist extends LitElement {
     private readonly storyService = new StoryService()
 
     private stories = new Task(this, {
-        task: async ([], {signal}) => {
-            const res = await this.storyService.getStories()
-            if (!res.ok) { 
-                throw new Error(res.status.toString()) 
-            }
-            return res.json()
-        },
+        task: async ([], {signal}) => this.storyService.getStories(),
         args: () => []
     })
 
@@ -56,7 +50,7 @@ export class Storylist extends LitElement {
             ${this.stories.render({
                 pending: () => html`<p>Loading...</p>`,
                 complete: (value) => html`
-                    ${value.result.map((s: Story) => html`
+                    ${value.map((s: Story) => html`
                     <div class="group flex flex-row border border-light-border cursor-pointer p-1 h-fit ${this.story == s.id ? 'selected' : 'bg-white'}" @click="${(e: Event) => this.on_click(s.id)}">
                         <div class="grow flex items-center">${s.name}</div>
                         <div class="invisible group-hover:visible flex flex-row">

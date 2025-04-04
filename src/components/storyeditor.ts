@@ -18,16 +18,7 @@ export class StoryEditor extends LitElement {
     private input: HTMLInputElement | null
 
     private storyblocks = new Task(this, {
-        task: async ([story], {signal}) => {
-            if (this.story) {
-                const res = await new StoryService().getStoryBlocks(story)
-                if (!res.ok) { 
-                    throw new Error(res.status.toString()) 
-                }
-                return res.json()
-            }
-            return { result: [] }
-        },
+        task: async ([story], {signal}) => new StoryService().getStoryBlocks(story),
         args: () => [this.story]
     })
 
@@ -66,7 +57,7 @@ export class StoryEditor extends LitElement {
                 ${this.storyblocks.render({
                     pending: () => html`<p>Loading...</p>`,
                     complete: (value) => html`
-                        ${value.result.map((s: Storyblock) => html`
+                        ${value.map((s: Storyblock) => html`
                         <div class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
                             <sl-details summary="User Prompt">${unsafeHTML(marked.parse(s.prompt ?? "", { async: false }))}</sl-details>
                             <div>

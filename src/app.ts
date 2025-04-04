@@ -9,6 +9,7 @@ import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
 import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
 import '@shoelace-style/shoelace/dist/components/spinner/spinner.js';
 import '@shoelace-style/shoelace/dist/components/switch/switch.js';
+import '@shoelace-style/shoelace/dist/components/tag/tag.js';
 
 import SlDrawer from "@shoelace-style/shoelace/dist/components/drawer/drawer.js";
 
@@ -19,7 +20,7 @@ import "./components/storylist";
 import "./components/storyeditor"
 import "./components/settings_dialog"
 import "./components/background_button"
-import "./components/background_form"
+import "./components/background_list"
 
 setBasePath('./assets/shoelace');
 
@@ -48,7 +49,7 @@ class MainWindow extends LitElement {
         </div>
 
         <sl-drawer id="sidebar" label="Background">
-            <background-form story=${this.story}></background-form>
+            <background-list story=${this.story}></background-list>
         </sl-drawer>
         `
     }

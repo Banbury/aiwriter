@@ -4,13 +4,15 @@ import { Task } from '@lit/task'
 import { StoryService } from "../services/story-service"
 import { SlDialog} from "@shoelace-style/shoelace"
 
-import "./story_form"
-import { StoryForm } from "./story_form"
-import { Story } from "../models/story"
+import { BackgroundForm } from "./background_form"
+import { Background } from "../models/background"
 
-@customElement("story-dialog")
-export class StoryDialog extends LitElement {
-    @property({ attribute: "story"}) story_id: number
+import "./background_form"
+
+@customElement("background-dialog")
+export class BackgroundDialog extends LitElement {
+    @property() story: number
+    @property({ attribute: "background"}) background_id: number
 
     private readonly storyService = new StoryService()
 
@@ -18,12 +20,17 @@ export class StoryDialog extends LitElement {
     private dialog: SlDialog
 
     @query("#form")
-    private form: StoryForm
+    private form: BackgroundForm
 
-    private story = new Task(this, {
-        task: async ([id], {signal}): Promise<Story> => new StoryService().getStory(id),
+    private background = new Task(this, {
+        task: async ([id], {signal}): Promise<Background> => {
+            if (id > 0) {
+              return this.storyService.getBackground(id)
+            }
+            return new Promise<Background>(resolve => resolve(new Background()))
+        },
         autoRun: false,
-        args: () => [this.story_id]
+        args: () => [this.background_id]
     })
 
     static styles = css`
@@ -44,13 +51,12 @@ export class StoryDialog extends LitElement {
         return html`
         <link href="./app.css" rel="stylesheet">
         <div>
-            <sl-button variant="text" @click="${this.on_open}"><sl-icon name="pencil-square"></sl-icon></sl-button>
-            <sl-dialog id="dialog" label="Story">
+            <sl-dialog id="dialog" label="Background" @sl-show=${this.on_open}>
                 <div>
-                    ${this.story.render({
+                    ${this.background.render({
                         pending: () => html`<p>Loading...</p>`,
                         complete: (value) => html`
-                        <story-form id="form" .story=${value}></story-form>
+                        <background-form id="form" .background=${value}></background-form>
                         `,
                         error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
                     })}
@@ -61,19 +67,21 @@ export class StoryDialog extends LitElement {
         `
     }
 
-    private on_open() {
-        if (this.story_id) {
-            this.story.run()
-        }
+    show() {
         this.dialog.show()
     }
 
+    private on_open() {
+        this.background.run()
+    }
+
     private on_save() {
-        this.storyService.saveStory({ 
-            id: this.story_id, 
+        this.storyService.saveBackground({ 
+            id: this.background_id, 
             name: this.form.name, 
-            description: this.form.description 
-        })
+            description: this.form.description,
+            tags: this.form.tags,
+        } as Background, this.story)
         .then (() => this.dispatchEvent(new CustomEvent("update", { bubbles: true, composed: true })))
         this.dialog.hide()
     }
