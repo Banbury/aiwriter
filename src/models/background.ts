@@ -4,6 +4,8 @@ import { JsonObject, JsonProperty } from "json2typescript";
 export class Background {
     @JsonProperty("id", Number)
     id: number = 0;
+    @JsonProperty("background")
+    background: number = 0;
     @JsonProperty("name", String)
     name: string = "";
     @JsonProperty("description")
@@ -23,7 +25,8 @@ export class Background {
         }
     }
 
-    enabled?: number;
+    @JsonProperty("tags")
+    enabled: number = 0;
 }
 
 export const BackgroundTags = {

@@ -83,6 +83,16 @@ export class StoryService {
         })
     }
 
+    async getBackgrounds(): Promise<Background[]> {
+        return this.executeScript("POST", "writer_get_backgrounds", {})
+        .then(res => {
+            if (!res.ok) { 
+                throw new Error(res.status.toString()) 
+            }
+            return res.json().then(d => d.result as Background[])
+        })
+    }
+
     async getBackground(id: number): Promise<Background> {
         return this.executeScript("POST", "writer_get_background_by_id", { id: id })
         .then(res => {
@@ -97,6 +107,16 @@ export class StoryService {
 
     async getBackgroundsForStory(id: number): Promise<Background[]> {
         return this.executeScript("POST", "writer_get_backgrounds_for_story", { id: id })
+        .then(res => {
+            if (!res.ok) { 
+                throw new Error(res.status.toString()) 
+            }
+            return res.json().then(d => d.result.map((r: Background) => this.mapper.deserialize(r, Background)) as Background[])
+        })
+    }
+
+    async getBackgroundsNotInStory(id: number): Promise<Background[]> {
+        return this.executeScript("POST", "writer_get_backgrounds_not_in_story", { id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -135,6 +155,20 @@ export class StoryService {
             name: background.name,
             description: background.description,
             tags: background.tags.join(",")
+        })
+    }
+
+    async addBackgroundToStory(story: number, background: number) {
+        return this.executeScript("POST", "writer_add_background_to_story", {
+            story: story,
+            background: background
+        })
+    }
+
+    async removeBackgroundFromStory(story: number, background: number) {
+        return this.executeScript("POST", "writer_remove_background_from_story", {
+            story: story,
+            background: background
         })
     }
 
