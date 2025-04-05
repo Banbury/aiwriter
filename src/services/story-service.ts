@@ -3,25 +3,17 @@ import { Background } from "../models/background"
 import { Story } from "../models/story"
 import { Storyblock } from "../models/storyblock"
 
-export class StoryService {
-    windmill_base_url = process.env.WINDMILL_BASE_URL
-    windmill_api_key = process.env.WINDMILL_API_KEY
-    windmill_api_url = `${this.windmill_base_url}/jobs/run/p/u/admin2`
-    windmill_job_url = `${this.windmill_base_url}/jobs_u/get`
-    windmill_result_url = `${this.windmill_base_url}/jobs_u/completed/get_result_maybe`
-    database = '$res:u/admin2/mysql_writer'
+import { WindmillService } from "./windmill-service"
 
-    HEADERS: Headers = new Headers(
-        {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${this.windmill_api_key}`
-        }
-    )
+export class StoryService {
+    windmillService = new WindmillService()
+
+    database = '$res:u/admin2/mysql_writer'
 
     mapper = new JsonConvert()
 
     async getStories(): Promise<Story[]> {
-        return this.executeScript("POST", "writer_get_stories")
+        return this.windmillService.executeScript("POST", "writer_get_stories", { database: this.database })
             .then(res => {
                 if (!res.ok) { 
                     throw new Error(res.status.toString()) 
@@ -31,7 +23,7 @@ export class StoryService {
     }
 
     async getStory(id: number): Promise<Story> {
-        return this.executeScript("POST", "writer_get_story_by_id", { id: id })
+        return this.windmillService.executeScript("POST", "writer_get_story_by_id", { database: this.database, id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -51,7 +43,8 @@ export class StoryService {
     }
 
     private async insertStory(story: Story) {
-        return this.executeScript("POST", "writer_insert_story", {
+        return this.windmillService.executeScript("POST", "writer_insert_story", {
+            database: this.database,
             name: story.name,
             description: story.description,
             model: story.model
@@ -59,7 +52,8 @@ export class StoryService {
     }
 
     private async updateStory(story: Story) {
-        return this.executeScript("POST", "writer_update_story", {
+        return this.windmillService.executeScript("POST", "writer_update_story", {
+            database: this.database,
             id: story.id,
             name: story.name,
             description: story.description,
@@ -68,13 +62,14 @@ export class StoryService {
     }
 
     async deleteStory(id: number) {
-        return this.executeScript("POST", "writer_delete_story", {
+        return this.windmillService.executeScript("POST", "writer_delete_story", {
+            database: this.database,
             id: id
         })
     }
 
     async getStoryBlocks(id: number): Promise<Storyblock[]> {
-        return this.executeScript("POST", "writer_get_story_blocks", { id: id })
+        return this.windmillService.executeScript("POST", "writer_get_story_blocks", { database: this.database, id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -84,7 +79,7 @@ export class StoryService {
     }
 
     async getBackgrounds(): Promise<Background[]> {
-        return this.executeScript("POST", "writer_get_backgrounds", {})
+        return this.windmillService.executeScript("POST", "writer_get_backgrounds", { database: this.database })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -94,7 +89,7 @@ export class StoryService {
     }
 
     async getBackground(id: number): Promise<Background> {
-        return this.executeScript("POST", "writer_get_background_by_id", { id: id })
+        return this.windmillService.executeScript("POST", "writer_get_background_by_id", { database: this.database, id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -106,7 +101,7 @@ export class StoryService {
     }
 
     async getBackgroundsForStory(id: number): Promise<Background[]> {
-        return this.executeScript("POST", "writer_get_backgrounds_for_story", { id: id })
+        return this.windmillService.executeScript("POST", "writer_get_backgrounds_for_story", { database: this.database, id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -116,7 +111,7 @@ export class StoryService {
     }
 
     async getBackgroundsNotInStory(id: number): Promise<Background[]> {
-        return this.executeScript("POST", "writer_get_backgrounds_not_in_story", { id: id })
+        return this.windmillService.executeScript("POST", "writer_get_backgrounds_not_in_story", { database: this.database, id: id })
         .then(res => {
             if (!res.ok) { 
                 throw new Error(res.status.toString()) 
@@ -126,7 +121,7 @@ export class StoryService {
     }
 
     async enableBackground(id: number, enabled: boolean) {
-        return this.executeScript("POST", "writer_enable_background", { id: id, enabled: Number(enabled) })
+        return this.windmillService.executeScript("POST", "writer_enable_background", { database: this.database, id: id, enabled: Number(enabled) })
     }
 
     async saveBackground(background: Background, story?: number) {
@@ -141,7 +136,8 @@ export class StoryService {
     }
 
     private async insertBackground(background: Background, story: number) {
-        return this.executeScript("POST", "writer_insert_background", {
+        return this.windmillService.executeScript("POST", "writer_insert_background", {
+            database: this.database,
             story: story,
             name: background.name,
             description: background.description,
@@ -150,7 +146,8 @@ export class StoryService {
     }
 
     private async updateBackground(background: Background) {
-        return this.executeScript("POST", "writer_update_background", {
+        return this.windmillService.executeScript("POST", "writer_update_background", {
+            database: this.database,
             id: background.id,
             name: background.name,
             description: background.description,
@@ -159,61 +156,19 @@ export class StoryService {
     }
 
     async addBackgroundToStory(story: number, background: number) {
-        return this.executeScript("POST", "writer_add_background_to_story", {
+        return this.windmillService.executeScript("POST", "writer_add_background_to_story", {
+            database: this.database,
             story: story,
             background: background
         })
     }
 
     async removeBackgroundFromStory(story: number, background: number) {
-        return this.executeScript("POST", "writer_remove_background_from_story", {
+        return this.windmillService.executeScript("POST", "writer_remove_background_from_story", {
+            database: this.database,
             story: story,
             background: background
         })
-    }
-
-    private async getResult(id: string): Promise<Response> {
-        let status = null
-        while (!status?.success) {
-            status = await this.getJobResultStatus(id)
-        }
-        return this.getJobResult(id);
-    }
-
-    private async executeScript(method = "POST", name: string, body={}): Promise<Response> {
-        return fetch(`${this.windmill_api_url}/${name}`, 
-            {
-                method: method,
-                headers: this.HEADERS,
-                body: JSON.stringify({
-                    database: this.database,
-                    ...body
-                }),
-            }
-        ).then(async (res) => {
-            return res.text()
-        }).then(async (job) => {
-            return this.getResult(job);
-        })
-    }
-
-    private async getJobResultStatus(id: string): Promise<any> {
-        return fetch(`${this.windmill_job_url}/${id}`, 
-            {
-                method: "GET",
-                headers: this.HEADERS,
-            }
-        )
-        .then(res => res.json())
-    }
-
-    private async getJobResult(id: string): Promise<Response> {
-        return fetch(`${this.windmill_result_url}/${id}`, 
-            {
-                method: "GET",
-                headers: this.HEADERS,
-            }
-        )
     }
 }
 
