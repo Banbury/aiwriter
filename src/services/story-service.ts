@@ -4,13 +4,30 @@ import { Story } from "../models/story"
 import { Storyblock } from "../models/storyblock"
 
 import { WindmillService } from "./windmill-service"
+import { LLMService } from "./llm-service"
 
 export class StoryService {
-    windmillService = new WindmillService()
+    private readonly windmillService = new WindmillService()
+    private readonly llmService = new LLMService()
 
     database = '$res:u/admin2/mysql_writer'
 
     mapper = new JsonConvert()
+
+    async writeStory(story: Story, userPrompt: string): Promise<string> {
+        return this.getPrompt(story.id)
+            .then(prompt => {
+                const messages: {role: string, content: string}[] = []
+                messages.push(
+                    { role: "user", content: `Write a story with the title "${story.name}".` },
+                    { role: "assistant", content: prompt },
+                    { role: "user", content: userPrompt }
+                )
+                return this.llmService.ollamaChat(story.model ?? "", messages)
+            })
+    }
+
+
 
     async getStories(): Promise<Story[]> {
         return this.windmillService.executeScript("POST", "writer_get_stories", { database: this.database })
@@ -131,7 +148,7 @@ export class StoryService {
             if (story) {
                 return this.insertBackground(background, story)
             }
-            throw new Error("Story is undefined.")
+            throw new Error("Background is undefined.")
         }
     }
 
@@ -170,5 +187,43 @@ export class StoryService {
             background: background
         })
     }
+
+    async saveStoryBlock(block: Storyblock) {
+        if (block.id > 0) {
+            return this.updateStoryBlock(block)
+        } else {
+            return this.insertStoryBlock(block)
+        }
+    }
+
+    private async insertStoryBlock(block: Storyblock) {
+        return this.windmillService.executeScript("POST", "writer_insert_story_block", {
+            database: this.database,
+            story: block.story,
+            prev: block.prev,
+            prompt: block.prompt,
+            text: block.text
+        })
+    }
+
+    private async updateStoryBlock(block: Storyblock) {
+        return this.windmillService.executeScript("POST", "writer_story_block", {
+            database: this.database,
+            id: block.id,
+            story: block.story,
+            prev: block.prev,
+            prompt: block.prompt,
+            text: block.text
+        })
+    }
+
+    private async getPrompt(story: number): Promise<string> {
+        return this.windmillService.executeScript("POST", "writer_get_story_prompt", {
+            database: this.database,
+            story: story
+        })
+        .then(res => res.json().then(d => d.result))
+    }
+
 }
 

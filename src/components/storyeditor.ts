@@ -6,17 +6,24 @@ import { Task } from '@lit/task'
 import { marked } from 'marked';
 
 import { StoryService } from "../services/story-service"
+import { WindmillService } from "../services/windmill-service";
 import { Storyblock } from "../models/storyblock"
 
-import { LLMService } from "../services/llm-service";
-
 import "./chat_input"
+import { ChatInput } from "./chat_input";
 
 @customElement('story-editor')
 export class StoryEditor extends LitElement {
-    @property() private story: number
+    @property() story: number
 
-    private readonly llmService = new LLMService()
+    @query("chat-input")
+    private chatInput: ChatInput
+
+    @query("#list")
+    private list: HTMLDivElement
+
+    private readonly windmillService = new WindmillService()
+    private readonly storyService = new StoryService()
 
     private storyblocks = new Task(this, {
         task: async ([story], {signal}) => new StoryService().getStoryBlocks(story),
@@ -55,7 +62,7 @@ export class StoryEditor extends LitElement {
                     pending: () => html`<p>Loading...</p>`,
                     complete: (value) => html`
                         ${value.map((s: Storyblock) => html`
-                        <div class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
+                        <div id="list" class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
                             <sl-details summary="User Prompt">${unsafeHTML(marked.parse(s.prompt ?? "", { async: false }))}</sl-details>
                             <div>
                                 ${unsafeHTML(marked.parse(s.text, { async: false }))}
@@ -83,10 +90,25 @@ export class StoryEditor extends LitElement {
 
     }
 
-    private on_send(e: CustomEvent) {
-        const userPrompt = e.detail.prompt
+    private async on_send(e: CustomEvent) {
+        const userPrompt = e.detail.prompt as string
+        this.storyService.getStory(this.story)
+            .then(s => this.storyService.writeStory(s, userPrompt))
+            .then(c => this.storyService.saveStoryBlock(
+                {
+                    id: 0,
+                    story: this.story,
+                    prev: this.storyblocks.value?.slice(-1).pop()?.id ?? 0,
+                    prompt: userPrompt,
+                    text: c
+                }
+            ))
+            .then(() => this.storyblocks.run())
+            .then(() => this.list.scrollTo({ top: this.list.scrollHeight, behavior: "smooth" }))
+            .then(() => this.chatInput.enable())
     }
 
     private on_abort() {
+        this.windmillService.stop()
     }
 }

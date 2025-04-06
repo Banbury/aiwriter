@@ -38,7 +38,7 @@ export class WindmillService {
 
     private async getResult(id: string): Promise<Response> {
         let status = null
-        while (!status?.success) {
+        while (!status || status["success"] == undefined) {
             status = await this.getJobResultStatus(id)
         }
         return this.getJobResult(id);

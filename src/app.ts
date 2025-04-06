@@ -43,7 +43,7 @@ class MainWindow extends LitElement {
                     <settings-dialog @click="${this.on_settings}"></settings-dialog>
                 </div>
             </title-bar>
-            <!-- <sl-button>Button</sl-button> -->
+            
             <div class="grid grid-cols-3 gap-2 p-2 grow">
                 <story-list class="border border-light-border" @selected="${this.on_story_selected}"></story-list>
                 <story-editor story=${this.story} class="border border-light-border col-span-2"></story-editor>

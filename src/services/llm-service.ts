@@ -1,31 +1,21 @@
 import { Story } from "../models/story";
+import { StoryService } from "./story-service";
 import { WindmillService } from "./windmill-service";
 
 export class LLMService {
-    windmillService = new WindmillService()
+    private readonly windmillService = new WindmillService()
+    private readonly storyService = new StoryService()
     
-    async writeStory(story: Story, userPrompt: string) {
-        return this.getPrompt(story.id)
-    }
-
     stop() {
         this.windmillService.stop()
     }
 
-    private async ollamaChat(model: string, messages: { role: string, content: string }[], options?: any) {
-        return this.windmillService.executeScript("POST", "writer_get_story_prompt", {
+    async ollamaChat(model: string, messages: { role: string, content: string }[], options: any = {}): Promise<string> {
+        return this.windmillService.executeScript("POST", "ollama_chat", {
             model: model,
             messages: messages,
             options: options
         })
-        .then((res: any) => res["message"]["content"])
+        .then((res: any) => res.json().then((d: any) => d.result["message"]["content"]))
     }
-
-    private async getPrompt(story: number): Promise<string> {
-        return this.windmillService.executeScript("POST", "writer_get_story_prompt", {
-            story: story
-        })
-        .then(res => res.text())
-    }
-
 }
