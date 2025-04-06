@@ -12,9 +12,12 @@ export class WindmillService {
         }
     )
 
+    abortController = new AbortController()
+
     async executeScript(method = "POST", name: string, body={}): Promise<Response> {
         return fetch(`${this.windmill_api_url}/${name}`, 
             {
+                signal: this.abortController.signal,
                 method: method,
                 headers: this.HEADERS,
                 body: JSON.stringify({
@@ -27,6 +30,10 @@ export class WindmillService {
         }).then(async (job) => {
             return this.getResult(job);
         })
+    }
+
+    stop() {
+        this.abortController.abort()
     }
 
     private async getResult(id: string): Promise<Response> {

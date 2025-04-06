@@ -1,13 +1,16 @@
 import { LitElement, html, TemplateResult, PropertyValues, css } from "lit"
-import {unsafeHTML} from 'lit/directives/unsafe-html.js';
-import { customElement, state, property } from 'lit/decorators.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { customElement, state, property, query } from 'lit/decorators.js'
 import { Task } from '@lit/task'
 
 import { marked } from 'marked';
 
 import { StoryService } from "../services/story-service"
 import { Storyblock } from "../models/storyblock"
+
 import { LLMService } from "../services/llm-service";
+
+import "./chat_input"
 
 @customElement('story-editor')
 export class StoryEditor extends LitElement {
@@ -15,16 +18,10 @@ export class StoryEditor extends LitElement {
 
     private readonly llmService = new LLMService()
 
-    private input: HTMLInputElement | null
-
     private storyblocks = new Task(this, {
         task: async ([story], {signal}) => new StoryService().getStoryBlocks(story),
         args: () => [this.story]
     })
-
-    protected firstUpdated(_changedProperties: PropertyValues): void {
-        this.input = this.renderRoot.querySelector("#input")
-    }
 
     static styles = css`
         sl-details::part(header) {
@@ -73,18 +70,9 @@ export class StoryEditor extends LitElement {
                     error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
                 })}
             </div>
-            <div ?hidden=${ !this.story } class="bg-white flex flex-row gap-2 p-2" style="box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);">
-                <textarea id="input" rows="3" class="border rounded border-light-border text-sm h-full grow"></textarea>
-                <sl-button variant="primary" @click="${this.on_send()}">
-                    Send <sl-icon name="send"></sl-icon>
-                </sl-button>
-            </div>
+            <chat-input ?hidden=${ !this.story } @send=${this.on_send} @abort=${this.on_abort}></chat-input>
         </div>
         `
-    }
-
-    private on_send() {
-        this.dispatchEvent(new CustomEvent('send', { detail: { prompt: this.input?.innerText }, bubbles: true, composed: true }))
     }
 
     private on_update() {
@@ -95,4 +83,10 @@ export class StoryEditor extends LitElement {
 
     }
 
+    private on_send(e: CustomEvent) {
+        const userPrompt = e.detail.prompt
+    }
+
+    private on_abort() {
+    }
 }
