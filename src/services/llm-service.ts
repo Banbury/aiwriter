@@ -4,7 +4,6 @@ import { WindmillService } from "./windmill-service";
 
 export class LLMService {
     private readonly windmillService = new WindmillService()
-    private readonly storyService = new StoryService()
     
     stop() {
         this.windmillService.stop()

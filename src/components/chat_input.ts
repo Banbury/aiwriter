@@ -20,7 +20,7 @@ export class ChatInput extends LitElement {
         <link href="./app.css" rel="stylesheet">
 
         <div class="bg-white flex flex-row gap-2 p-2" style="box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);">
-            <textarea id="input" rows="3" class="border rounded border-light-border text-sm p-2 h-full grow" value=${this.value}></textarea>
+            <textarea id="input" rows="3" class="border rounded border-light-border text-sm p-2 h-full grow" .value=${this.value}></textarea>
             <sl-button id="send" variant="primary" @click=${this.on_send}>
                 Send <sl-icon name="send"></sl-icon>
             </sl-button>
@@ -39,8 +39,8 @@ export class ChatInput extends LitElement {
 
     private on_send() {
         this.enable(false)
-        this.input.value = ""
         this.dispatchEvent(new CustomEvent('send', { detail: { prompt: this.input?.value }, bubbles: true, composed: true }))
+        this.input.value = ""
     }
 
     private on_abort() {

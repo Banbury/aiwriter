@@ -188,6 +188,27 @@ export class StoryService {
         })
     }
 
+    async getStoryBlock(block: number): Promise<Storyblock> {
+        return this.windmillService.executeScript("POST", "writer_get_story_block_by_id", {
+            database: this.database,
+            id: block
+        })
+        .then(res => {
+            if (!res.ok) { 
+                throw new Error(res.status.toString()) 
+            }
+            return res.json().then(d => d.result[0] as Storyblock)
+        })
+
+    }
+
+    async deleteStoryBlock(block: number) {
+        return this.windmillService.executeScript("POST", "writer_delete_storyblock", {
+            database: this.database,
+            id: block
+        })
+    }
+
     async saveStoryBlock(block: Storyblock) {
         if (block.id > 0) {
             return this.updateStoryBlock(block)

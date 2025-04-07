@@ -68,7 +68,7 @@ export class StoryEditor extends LitElement {
                                 ${unsafeHTML(marked.parse(s.text, { async: false }))}
                             </div>
                             <div class="absolute corner invisible group-hover:visible flex flex-row">
-                                <story-dialog story="${s.id}" @update="${this.on_update}"></story-dialog>
+                                <!-- <story-dialog story="${s.id}" @update="${this.on_update}"></story-dialog> -->
                                 <sl-button variant="text" @click="${() => this.on_delete(s.id)}"><sl-icon name="trash"></sl-icon></sl-button>
                             </div>
                         </div>
@@ -77,7 +77,7 @@ export class StoryEditor extends LitElement {
                     error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
                 })}
             </div>
-            <chat-input ?hidden=${ !this.story } @send=${this.on_send} @abort=${this.on_abort}></chat-input>
+            <chat-input ?hidden=${ !this.story } @send=${(e: CustomEvent) => this.on_send(e.detail.prompt)} @abort=${this.on_abort}></chat-input>
         </div>
         `
     }
@@ -87,11 +87,13 @@ export class StoryEditor extends LitElement {
     }
 
     private on_delete(id: number) {
-
+        this.storyService.getStoryBlock(id)
+        .then(b => this.chatInput.value = b.prompt)
+        .then(() => this.storyService.deleteStoryBlock(id))
+        .then(() => this.storyblocks.run())
     }
 
-    private async on_send(e: CustomEvent) {
-        const userPrompt = e.detail.prompt as string
+    private async on_send(userPrompt: string) {
         this.storyService.getStory(this.story)
             .then(s => this.storyService.writeStory(s, userPrompt))
             .then(c => this.storyService.saveStoryBlock(
