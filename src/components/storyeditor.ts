@@ -11,10 +11,11 @@ import { Storyblock } from "../models/storyblock"
 
 import "./chat_input"
 import { ChatInput } from "./chat_input";
+import { Story } from "../models/story";
 
 @customElement('story-editor')
 export class StoryEditor extends LitElement {
-    @property() story: number
+    @property() story: Story
 
     @query("chat-input")
     private chatInput: ChatInput
@@ -26,7 +27,7 @@ export class StoryEditor extends LitElement {
     private readonly storyService = new StoryService()
 
     private storyblocks = new Task(this, {
-        task: async ([story], {signal}) => new StoryService().getStoryBlocks(story),
+        task: async ([story], {signal}) => story ? new StoryService().getStoryBlocks(story.id) : [],
         args: () => [this.story]
     })
 
@@ -94,12 +95,11 @@ export class StoryEditor extends LitElement {
     }
 
     private async on_send(userPrompt: string) {
-        this.storyService.getStory(this.story)
-            .then(s => this.storyService.writeStory(s, userPrompt))
+        this.storyService.writeStory(this.story, userPrompt)
             .then(c => this.storyService.saveStoryBlock(
                 {
                     id: 0,
-                    story: this.story,
+                    story: this.story.id,
                     prev: this.storyblocks.value?.slice(-1).pop()?.id ?? 0,
                     prompt: userPrompt,
                     text: c

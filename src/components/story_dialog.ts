@@ -44,7 +44,7 @@ export class StoryDialog extends LitElement {
         return html`
         <link href="./app.css" rel="stylesheet">
         <div>
-            <sl-button variant="text" @click="${this.on_open}"><sl-icon name="pencil-square"></sl-icon></sl-button>
+            <sl-button variant="text" @click=${this.on_open}><sl-icon name="pencil-square"></sl-icon></sl-button>
             <sl-dialog id="dialog" label="Story">
                 <div>
                     ${this.story.render({

@@ -12,7 +12,7 @@ import { MessageBox } from "./message_box"
 
 @customElement('story-list')
 export class Storylist extends LitElement {
-    @state() private story: number | undefined
+    @state() private story: Story
 
     @query("#delete_story_msg")
     messageBoxDeletStory: MessageBox
@@ -51,7 +51,7 @@ export class Storylist extends LitElement {
                 pending: () => html`<p>Loading...</p>`,
                 complete: (value) => html`
                     ${value.map((s: Story) => html`
-                    <div class="group flex flex-row border border-light-border cursor-pointer p-1 h-fit ${this.story == s.id ? 'selected' : 'bg-white'}" @click="${(e: Event) => this.on_click(s.id)}">
+                    <div class="group flex flex-row border border-light-border cursor-pointer p-1 h-fit ${this.story?.id == s.id ? 'selected' : 'bg-white'}" @click="${(e: Event) => this.on_click(s)}">
                         <div class="grow flex items-center">${s.name}</div>
                         <div class="invisible group-hover:visible flex flex-row">
                             <story-dialog story="${s.id}" @update="${this.on_update}"></story-dialog>
@@ -73,9 +73,9 @@ export class Storylist extends LitElement {
         this.stories.run()
     }
 
-    private on_click(id: number) {
-        this.story = id
-        this.dispatchEvent(new CustomEvent('selected', { detail: { story: id }, bubbles: true, composed: true }))
+    private on_click(story: Story) {
+        this.story = story
+        this.dispatchEvent(new CustomEvent('selected', { detail: { story: story }, bubbles: true, composed: true }))
     }
 
     private on_delete(id: number) {

@@ -85,6 +85,14 @@ export class StoryService {
         })
     }
 
+    async saveStoryModel(id: number, model: string) {
+        return this.windmillService.executeScript("POST", "writer_save_story_model", {
+            database: this.database,
+            id: id,
+            model: model
+        })
+    }
+
     async getStoryBlocks(id: number): Promise<Storyblock[]> {
         return this.windmillService.executeScript("POST", "writer_get_story_blocks", { database: this.database, id: id })
         .then(res => {
