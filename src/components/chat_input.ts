@@ -1,5 +1,5 @@
 import { SlButton, SlTextarea } from "@shoelace-style/shoelace"
-import { LitElement, html, TemplateResult, PropertyValues, css } from "lit"
+import { LitElement, html, TemplateResult, PropertyValues, css, CSSResultGroup } from "lit"
 import { customElement, state, property, query } from 'lit/decorators.js'
 
 @customElement('chat-input')
@@ -15,11 +15,17 @@ export class ChatInput extends LitElement {
     @query("#input")
     private input: SlTextarea
 
+    static styles? = css`
+        :host {
+            box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);
+        }
+    `
+
     protected render(): TemplateResult {
         return html`
         <link href="./app.css" rel="stylesheet">
 
-        <div class="bg-white flex flex-row gap-2 p-2" style="box-shadow: 0px -4px 6px 0px rgba(0, 0, 0, 0.1);">
+        <div class="bg-white flex flex-row gap-2 p-2">
             <textarea id="input" rows="3" class="border rounded border-light-border text-sm p-2 h-full grow" .value=${this.value}></textarea>
             <sl-button id="send" variant="primary" @click=${this.on_send}>
                 Send <sl-icon name="send"></sl-icon>

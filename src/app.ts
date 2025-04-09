@@ -89,7 +89,7 @@ class MainWindow extends LitElement {
                     })}
                 </sl-select>
             </div>
-            <background-list story=${this.story}></background-list>
+            <background-list story=${this.story?.id}></background-list>
         </sl-drawer>
         <sl-dialog id="dialog" label="Settings">
             <sl-button variant="primary" slot="footer" @click="${this.on_saveSettings}">Save</sl-button>

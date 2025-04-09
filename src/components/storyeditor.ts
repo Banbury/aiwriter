@@ -57,15 +57,15 @@ export class StoryEditor extends LitElement {
     protected render(): TemplateResult {
         return html`
         <link href="./app.css" rel="stylesheet">
-        <div class="h-full flex flex-col">
-            <div class="p-2 overflow-y-auto grow flex flex-col gap-2">
+        <div class="flex flex-col" style="height: calc(100vh - 63px);">
+            <div id="list" class="p-2 overflow-y-auto grow flex flex-col gap-2">
                 ${this.storyblocks.render({
                     pending: () => html`<p>Loading...</p>`,
                     complete: (value) => html`
                         ${value.map((s: Storyblock) => html`
-                        <div id="list" class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
+                        <div class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
                             <sl-details summary="User Prompt">${unsafeHTML(marked.parse(s.prompt ?? "", { async: false }))}</sl-details>
-                            <div>
+                            <div class="p-2">
                                 ${unsafeHTML(marked.parse(s.text, { async: false }))}
                             </div>
                             <div class="absolute corner invisible group-hover:visible flex flex-row">
@@ -78,7 +78,7 @@ export class StoryEditor extends LitElement {
                     error: (error) => html`<p>Oops, something went wrong: ${error}</p>`,
                 })}
             </div>
-            <chat-input ?hidden=${ !this.story } @send=${(e: CustomEvent) => this.on_send(e.detail.prompt)} @abort=${this.on_abort}></chat-input>
+            <chat-input class="relative" ?hidden=${ !this.story } @send=${(e: CustomEvent) => this.on_send(e.detail.prompt)} @abort=${this.on_abort}></chat-input>
         </div>
         `
     }
@@ -106,7 +106,7 @@ export class StoryEditor extends LitElement {
                 }
             ))
             .then(() => this.storyblocks.run())
-            .then(() => this.list.scrollTo({ top: this.list.scrollHeight, behavior: "smooth" }))
+            .then(() => this.list.lastElementChild?.scrollIntoView({ behavior: "smooth" }))
             .then(() => this.chatInput.enable())
     }
 
