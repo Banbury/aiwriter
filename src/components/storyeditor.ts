@@ -17,11 +17,16 @@ import { Story } from "../models/story";
 export class StoryEditor extends LitElement {
     @property() story: Story
 
+    @state() private editMode = 0
+
     @query("chat-input")
     private chatInput: ChatInput
 
     @query("#list")
     private list: HTMLDivElement
+
+    @query("sl-textarea")
+    private editor: HTMLTextAreaElement
 
     private readonly windmillService = new WindmillService()
     private readonly storyService = new StoryService()
@@ -36,15 +41,7 @@ export class StoryEditor extends LitElement {
             height: 0px;
         }
 
-        sl-button[variant="text"] {
-            width: 25px;
-        }
-
-        sl-button[variant="text"]::part(base) {
-            color: black;
-        }
-
-        sl-button[variant="text"]::part(base):hover {
+        icon-button[icon="trash"]:hover {
             color: red;
         }
 
@@ -65,13 +62,22 @@ export class StoryEditor extends LitElement {
                         ${value.map((s: Storyblock) => html`
                         <div class="group relative border border-light-border cursor-pointer w-auto p-2 h-fit flex flex-col gap-2 bg-white">
                             <sl-details summary="User Prompt">${unsafeHTML(marked.parse(s.prompt ?? "", { async: false }))}</sl-details>
+                            ${(this.editMode != s.id) ? html`
                             <div class="p-2">
                                 ${unsafeHTML(marked.parse(s.text, { async: false }))}
                             </div>
                             <div class="absolute corner invisible group-hover:visible flex flex-row">
-                                <!-- <story-dialog story="${s.id}" @update="${this.on_update}"></story-dialog> -->
-                                <sl-button variant="text" @click="${() => this.on_delete(s.id)}"><sl-icon name="trash"></sl-icon></sl-button>
+                                <icon-button icon="pencil-square" @click=${() => this.on_edit(s.id)}></icon-button>
+                                <icon-button icon="trash" @click=${() => this.on_delete(s.id)}></icon-button>
                             </div>
+                            ` : html`
+                            <sl-textarea resize="auto" class="p-2 border border-light-border h-fit" .value= ${s.text}></sl-textarea>
+                            <div class="flex flex-row gap-2">
+                                <sl-button @click=${this.on_save}>Save</sl-button>
+                                <sl-button @click=${this.on_cancelEdit}>Cancel</sl-button>
+                            </div>
+                            `
+                            }
                         </div>
                         `)}
                     `,
@@ -83,8 +89,33 @@ export class StoryEditor extends LitElement {
         `
     }
 
+    protected updated(changedProperties: PropertyValues): void {
+        if (changedProperties.has('editMode') && this.editor) {
+            this.editor.parentElement?.scrollIntoView({ behavior: "smooth" })
+        }
+    }
+
     private on_update() {
         this.storyblocks.run()
+    }
+
+    private on_edit(id: number) {
+        this.editMode = id
+    }
+
+    private on_cancelEdit() {
+        this.editMode = 0
+    }
+
+    private on_save() {
+        if (this.storyblocks.value) {
+            const block = this.storyblocks.value.find(sb => sb.id == this.editMode)
+            if (block) {
+                block.text = this.editor.value
+                this.storyService.saveStoryBlock(block)
+            }
+        }
+        this.editMode = 0
     }
 
     private on_delete(id: number) {

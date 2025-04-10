@@ -236,7 +236,7 @@ export class StoryService {
     }
 
     private async updateStoryBlock(block: Storyblock) {
-        return this.windmillService.executeScript("POST", "writer_story_block", {
+        return this.windmillService.executeScript("POST", "writer_update_story_block", {
             database: this.database,
             id: block.id,
             story: block.story,
